@@ -2,94 +2,106 @@ using System.Collections.Generic;
 
 namespace GameProgramming2D.State
 {
-    public enum StateType
-    {
-        Error = -1,
-        MainMenu,
-        Game,
-        GameOver
-    }
+	public enum StateType
+	{
+		Error = -1,
+		MainMenu,
+		Game,
+		GameOver
+	}
 
-    public enum TransitionType
-    {
-        Error = -1,
-        MainMenuToGame,
-        GameToGameOver,
-        GameOverToGame,
-        GameOverToMenu
-    }
+	public enum TransitionType
+	{
+		Error = -1,
+		MainMenuToGame,
+		GameToGameOver,
+		GameOverToGame,
+		GameOverToMenu
+	}
 
-    public class GameStateManager
-    {
-        private List<StateBase> _states = new List<StateBase> ();
+	public class GameStateManager
+	{
+		public delegate void StateLoadedDelegate ( StateType type );
+		public event StateLoadedDelegate StateLoaded;
 
-        public StateBase CurrentState { get; private set; }
-        public StateType CurrentStateType { get { return CurrentState.State; } }
+		private List<StateBase> _states = new List<StateBase> ();
 
-        public GameStateManager( StateBase initialState )
-        {
-            if(AddState(initialState))
-            {
-                CurrentState = initialState;
-            }
-        }
+		public StateBase CurrentState { get; private set; }
+		public StateType CurrentStateType { get { return CurrentState.State; } }
 
-        public bool AddState(StateBase state)
-        {
-            bool exists = false;
-            foreach (var stateBase in _states)
-            {
-                if(stateBase.State == state.State)
-                {
-                    exists = true;
-                }
-            }
+		public GameStateManager ( StateBase initialState )
+		{
+			if ( AddState ( initialState ) )
+			{
+				CurrentState = initialState;
+			}
+		}
 
-            if(!exists)
-            {
-                _states.Add ( state );
-            }
+		public void RaiseStateLoaded(StateType state)
+		{
+			if(StateLoaded != null)
+			{
+				StateLoaded ( state );
+			}
+		}
 
-            return !exists;
-        }
+		public bool AddState ( StateBase state )
+		{
+			bool exists = false;
+			foreach ( var stateBase in _states )
+			{
+				if ( stateBase.State == state.State )
+				{
+					exists = true;
+				}
+			}
 
-        public bool RemoveState(StateType stateType)
-        {
-            StateBase state = null;
-            foreach (var stateBase in _states)
-            {
-                if(stateBase.State == stateType)
-                {
-                    state = stateBase;
-                }
-            }
+			if ( !exists )
+			{
+				_states.Add ( state );
+			}
 
-            return state != null && _states.Remove ( state );
-        }
+			return !exists;
+		}
 
-        public void PerformTransition(TransitionType transition)
-        {
-            if(transition == TransitionType.Error)
-            {
-                return;
-            }
+		public bool RemoveState ( StateType stateType )
+		{
+			StateBase state = null;
+			foreach ( var stateBase in _states )
+			{
+				if ( stateBase.State == stateType )
+				{
+					state = stateBase;
+				}
+			}
 
-            // If target state is Error or same as current state just return.
-            StateType targetStateType = CurrentState.GetTargetStateType ( transition );
-            if(targetStateType == StateType.Error || targetStateType == CurrentStateType )
-            {
-                return;
-            }
+			return state != null && _states.Remove ( state );
+		}
 
-            foreach(var state in _states)
-            {
-                if(state.State == targetStateType)
-                {
-                    CurrentState.StateDeactivating ();
-                    CurrentState = state;
-                    CurrentState.StateActivated ();
-                }
-            }
-        }
-    }
+		public void PerformTransition ( TransitionType transition )
+		{
+			if ( transition == TransitionType.Error )
+			{
+				return;
+			}
+
+			// If target state is Error or same as current state just return.
+			StateType targetStateType = CurrentState.GetTargetStateType ( transition );
+			if ( targetStateType == StateType.Error || targetStateType == CurrentStateType )
+			{
+				return;
+			}
+
+			// Find the state with targetStateType and activate it.
+			foreach ( var state in _states )
+			{
+				if ( state.State == targetStateType )
+				{
+					CurrentState.StateDeactivating ();
+					CurrentState = state;
+					CurrentState.StateActivated ();
+				}
+			}
+		}
+	}
 }

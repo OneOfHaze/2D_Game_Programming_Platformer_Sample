@@ -1,8 +1,15 @@
 using UnityEngine;
+using GameProgramming2D;
 using System.Collections;
 
 public class Enemy : MonoBehaviour
 {
+	public enum EnemyType
+	{
+		WithShip,
+		WithoutShip
+	}
+
 	public float moveSpeed = 2f;		// The speed the enemy moves at.
 	public int HP = 2;					// How many times the enemy can be hit before it dies.
 	public Sprite deadEnemy;			// A sprite of the enemy when it's dead.
@@ -18,11 +25,30 @@ public class Enemy : MonoBehaviour
 	private Transform frontCheck;		// Reference to the position of the gameobject used for checking if something is in front.
 	private bool dead = false;			// Whether or not the enemy is dead.
 	private Score score;        // Reference to the Score script.
+
+	[SerializeField]
+	private EnemyType _enemyType;
+
+	public EnemyType Type
+	{
+		get { return _enemyType; }
+	}
+
+	public Rigidbody2D Rigidbody { get; private set; }
 	
 	void Awake()
 	{
+		Rigidbody = GetComponent<Rigidbody2D> ();
+
 		// Setting up the references.
 		score = FindObjectOfType<Score> ();
+
+		GameManager.Instance.AddEnemy ( this );
+	}
+
+	void OnDisable()
+	{
+		GameManager.Instance.RemoveEnemy ( this );
 	}
 
 	void FixedUpdate ()

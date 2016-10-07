@@ -6,43 +6,48 @@ using UnityEngine;
 
 namespace GameProgramming2D
 {
-    public class InputManager : MonoBehaviour
-    {
-        private void Update ()
-        {
-            if ( Input.GetKeyUp ( KeyCode.P ) )
-            {
-                // Pause game
-                GameManager.Instance.Pauser.TogglePause ();
-            }
+	public class InputManager : MonoBehaviour
+	{
+		private void Update ()
+		{
+			if ( Input.GetKeyUp ( KeyCode.P ) )
+			{
+				// Pause game
+				GameManager.Instance.Pauser.TogglePause ();
+			}
 
-            HandlePlayerInputs ();
-        }
+			HandlePlayerInputs ();
+		}
 
-        private static void HandlePlayerInputs ()
-        {
-            if( GameManager.Instance.Player == null)
-            {
-                return;
-            }
+		private static void HandlePlayerInputs ()
+		{
+			if ( GameManager.Instance.Player == null )
+			{
+				return;
+			}
 
-            if ( Input.GetButtonDown ( "Jump" ) )
-            {
-                GameManager.Instance.Player.Jump = true;
-            }
+			if ( Input.GetKeyDown ( KeyCode.S ) )
+			{
+				GameManager.Instance.Save ();
+			}
 
-            if ( Input.GetButtonDown ( "Fire1" ) )
-            {
-                GameManager.Instance.Player.Gun.Fire ();
-            }
+			if ( Input.GetButtonDown ( "Jump" ) )
+			{
+				GameManager.Instance.Player.Jump = true;
+			}
 
-            if ( Input.GetButtonDown ( "Fire2" ) )
-            {
-                GameManager.Instance.Player.LayBomb ();
-            }
+			if ( Input.GetButtonDown ( "Fire1" ) )
+			{
+				GameManager.Instance.Player.Gun.Fire ();
+			}
 
-            var horizontal = Input.GetAxis ( "Horizontal" );
-            GameManager.Instance.Player.SetHorizontal ( horizontal );
-        }
-    }
+			if ( Input.GetButtonDown ( "Fire2" ) )
+			{
+				GameManager.Instance.Player.LayBomb ();
+			}
+
+			var horizontal = Input.GetAxis ( "Horizontal" );
+			GameManager.Instance.Player.SetHorizontal ( horizontal );
+		}
+	}
 }

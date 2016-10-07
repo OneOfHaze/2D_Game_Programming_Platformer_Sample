@@ -1,20 +1,34 @@
 using UnityEngine;
+using UnityEngine.UI;
 using GameProgramming2D.State;
 using System.Collections;
 
 namespace GameProgramming2D.GUI
 {
-    public class MainMenuGUI : MonoBehaviour
-    {
-        public void OnStartGamePressed()
-        {
-            GameManager.Instance.StateManager
-                .PerformTransition ( TransitionType.MainMenuToGame );
-        }
+	public class MainMenuGUI : MonoBehaviour
+	{
+		[SerializeField]
+		private Button _loadButton;
 
-        public void OnExitGamePressed()
-        {
-            Application.Quit ();
-        }
-    }
+		protected void Awake()
+		{
+			_loadButton.interactable = SaveSystem.DoesSaveExist ();
+		}
+
+		public void OnStartGamePressed ()
+		{
+			GameManager.Instance.StateManager
+					.PerformTransition ( TransitionType.MainMenuToGame );
+		}
+
+		public void OnLoadGamePressed()
+		{
+			GameManager.Instance.LoadGame ();
+		}
+
+		public void OnExitGamePressed ()
+		{
+			Application.Quit ();
+		}
+	}
 }
