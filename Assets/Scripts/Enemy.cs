@@ -48,7 +48,8 @@ public class Enemy : MonoBehaviour
 
 	void OnDisable()
 	{
-		GameManager.Instance.RemoveEnemy ( this );
+		if(!GameManager.IsApplicationClosing)
+			GameManager.Instance.RemoveEnemy ( this );
 	}
 
 	void FixedUpdate ()

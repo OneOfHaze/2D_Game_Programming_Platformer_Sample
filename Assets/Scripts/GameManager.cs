@@ -1,14 +1,15 @@
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using GameProgramming2D.State;
-using System.Collections;
-using System;
 using System.Collections.Generic;
+using GameProgramming2D.GUI;
+using System;
 
 namespace GameProgramming2D
 {
 	public class GameManager : MonoBehaviour
 	{
+		public static bool IsApplicationClosing { get; private set; }
+
 		private static GameManager _instance;
 
 		public static GameManager Instance
@@ -23,6 +24,21 @@ namespace GameProgramming2D
 			}
 		}
 
+		void OnApplicationQuit()
+		{
+			IsApplicationClosing = true;
+		}
+
+		public void QuitGame ()
+		{
+			Dialog dialog = GUIManager.CreateDialog ();
+			dialog.SetHeadline ( "Quit game" );
+			dialog.SetText ( "Are you sure you want to quit game?" );
+			dialog.SetOnOKClicked ( () => Application.Quit () ); // Anonymous method (lambda)
+			dialog.SetOnCancelClicked ();
+			dialog.Show ();
+		}
+
 		public delegate void SceneLoadedDelegate ( int sceneIndex );
 		public event SceneLoadedDelegate SceneLoaded;
 
@@ -35,6 +51,9 @@ namespace GameProgramming2D
 		private Enemy _enemyWithShip;
 		[SerializeField]
 		private Enemy _enemyWithoutShip;
+
+		[SerializeField]
+		private GUIManager _guiManagerPrefab;
 
 		public Pauser Pauser
 		{
@@ -57,6 +76,7 @@ namespace GameProgramming2D
 		}
 
 		public GameStateManager StateManager { get; private set; }
+		public GUIManager GUIManager { get; private set; }
 
 		private void Awake ()
 		{
@@ -89,10 +109,22 @@ namespace GameProgramming2D
 		private void Init ()
 		{
 			// Let's get required references to other components.
+			IsApplicationClosing = false;
 			_pauser = gameObject.GetOrAddComponent<Pauser> ();
 			_inputManager = gameObject.GetOrAddComponent<InputManager> ();
 			_playerControl = FindObjectOfType<PlayerControl> ();
 			InitGameStateManager ();
+			InitGUIManager ();
+		}
+
+		private void InitGUIManager ()
+		{
+			// Create a new GUIManager instance from _guiManager prefab
+			GUIManager = Instantiate ( _guiManagerPrefab );
+			// Reparent it to GameManager's child.
+			GUIManager.transform.SetParent ( transform, true );
+			// Initialize GUIManager.
+			GUIManager.Init ();
 		}
 
 		private void InitGameStateManager ()

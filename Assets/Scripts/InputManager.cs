@@ -13,7 +13,12 @@ namespace GameProgramming2D
 			if ( Input.GetKeyUp ( KeyCode.P ) )
 			{
 				// Pause game
-				GameManager.Instance.Pauser.TogglePause ();
+				GameManager.Instance.Pauser.SetPauseOn ();
+			}
+
+			if(Input.GetKeyDown(KeyCode.Escape))
+			{
+				GameManager.Instance.QuitGame ();
 			}
 
 			HandlePlayerInputs ();
